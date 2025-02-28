@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'chatify-25a03.firebasestorage.app',
     measurementId: 'G-NJWDF4C8YG',
   );
+
 }

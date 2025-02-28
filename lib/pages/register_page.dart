@@ -1,3 +1,4 @@
+import 'package:chatify/auth/auth_service.dart';
 import 'package:chatify/components/my_button.dart';
 import 'package:chatify/components/my_text_field.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,34 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  void register() {}
+  void register(BuildContext context) {
+    final auth = AuthService();
+    if (_passwordController.text == _confirmPasswordController.text) {
+      try {
+        auth.signUpWithEmailPassword(
+            _emailController.text, _passwordController.text);
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => const AlertDialog(
+          title: Text(
+            "Passwords don't match",
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +90,7 @@ class RegisterPage extends StatelessWidget {
             ),
             MyButton(
               text: 'Register',
-              onTap: register,
+              onTap: () => register(context),
             ),
             const SizedBox(
               height: 25,
