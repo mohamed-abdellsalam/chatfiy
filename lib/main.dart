@@ -1,5 +1,5 @@
-import 'package:chatify/auth/auth_gate.dart';
 import 'package:chatify/firebase_options.dart';
+import 'package:chatify/services/auth/auth_gate.dart';
 import 'package:chatify/themes/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

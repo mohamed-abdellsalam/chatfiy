@@ -1,6 +1,6 @@
-import 'package:chatify/auth/auth_service.dart';
 import 'package:chatify/components/my_button.dart';
 import 'package:chatify/components/my_text_field.dart';
+import 'package:chatify/services/auth/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
