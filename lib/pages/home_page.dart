@@ -5,10 +5,20 @@ import 'package:chatify/services/auth/auth_service.dart';
 import 'package:chatify/services/chat/chat_services.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final ChatServices _chatServices = ChatServices();
   final AuthService _authService = AuthService();
+
+  void logout() async {
+    await _authService.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,17 +27,7 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
-        title: const Text(
-          'Home',
-        ),
-        // actions: [
-        //   IconButton(
-        //     onPressed: logout,
-        //     icon: const Icon(
-        //       Icons.logout,
-        //     ),
-        //   ),
-        // ],
+        title: const Text('Home'),
       ),
       drawer: const MyDrawer(),
       body: _buildUserList(),
@@ -39,17 +39,22 @@ class HomePage extends StatelessWidget {
       stream: _chatServices.getUsersStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Error');
+          return const Center(child: Text('Error loading users'));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading');
+          return const Center(child: CircularProgressIndicator());
         }
-        return ListView(
-          children: snapshot.data!
-              .map<Widget>(
-                (userData) => _buildUserListItem(userData, context),
-              )
-              .toList(),
+        if (!snapshot.hasData ||
+            snapshot.data == null ||
+            snapshot.data!.isEmpty) {
+          return const Center(child: Text('No users available'));
+        }
+
+        return ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            return _buildUserListItem(snapshot.data![index], context);
+          },
         );
       },
     );
@@ -57,23 +62,25 @@ class HomePage extends StatelessWidget {
 
   Widget _buildUserListItem(
       Map<String, dynamic> userData, BuildContext context) {
-    if (userData["email"] != _authService.getCurrentUser()!.email) {
-      return UserTile(
-        text: userData["email"],
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatPage(
-                receiverEmail: userData["email"],
-                receiverID: userData["uid"],
-              ),
-            ),
-          );
-        },
-      );
-    } else {
-      return Container(); // Return an empty container if the user is the current user
+    final currentUserEmail = _authService.getCurrentUser()?.email;
+
+    if (userData["email"] == currentUserEmail) {
+      return const SizedBox(); // Hide current user from list
     }
+
+    return UserTile(
+      text: userData["email"],
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              receiverEmail: userData["email"],
+              receiverID: userData["uid"],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
