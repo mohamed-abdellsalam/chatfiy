@@ -6,8 +6,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage(
-      {super.key, required this.receiverEmail, required this.receiverID});
+  const ChatPage({
+    super.key,
+    required this.receiverEmail,
+    required this.receiverID,
+  });
+
   final String receiverEmail;
   final String receiverID;
 
@@ -17,25 +21,27 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
-
   final ChatServices _chatServices = ChatServices();
-
   final AuthService _authService = AuthService();
-
+  final ScrollController _scrollController = ScrollController();
   FocusNode focusNode = FocusNode();
+  String? receiverName;
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _fetchReceiverName();
+
     focusNode.addListener(() {
       if (focusNode.hasFocus) {
         Future.delayed(
-          const Duration(
-            milliseconds: 500,
-          ),
+          const Duration(milliseconds: 500),
           () => scrollDown(),
         );
       }
     });
+
     Future.delayed(
       const Duration(milliseconds: 500),
       () => scrollDown(),
@@ -49,7 +55,6 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  final ScrollController _scrollController = ScrollController();
   void scrollDown() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -63,10 +68,39 @@ class _ChatPageState extends State<ChatPage> {
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
       await _chatServices.sendMessage(
-          widget.receiverID, _messageController.text);
+        widget.receiverID,
+        _messageController.text,
+      );
       _messageController.clear();
     }
     scrollDown();
+  }
+
+  Future<void> _fetchReceiverName() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.receiverID)
+          .get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        setState(() {
+          receiverName = userDoc["name"] ?? 'Unknown';
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          receiverName = null;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+      setState(() {
+        receiverName = null;
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -77,7 +111,14 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
-        title: Text(widget.receiverEmail),
+        title: isLoading
+            ? const CircularProgressIndicator()
+            : Text(
+                receiverName != null
+                    ? '$receiverName (${widget.receiverEmail})'
+                    : widget.receiverEmail,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
       ),
       body: Column(
         children: [
@@ -96,13 +137,13 @@ class _ChatPageState extends State<ChatPage> {
       stream: _chatServices.getMessages(widget.receiverID, senderID),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Error');
+          return const Center(child: Text('Error loading messages'));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Text('No messages yet');
+          return const Center(child: Text('No messages yet'));
         }
         return ListView(
           controller: _scrollController,
@@ -116,9 +157,10 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageItem(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     bool isCurrentUser = data['senderID'] == _authService.getCurrentUser()!.uid;
-    var aligment = isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
+    var alignment =
+        isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
     return Container(
-      alignment: aligment,
+      alignment: alignment,
       child: Column(
         crossAxisAlignment:
             isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,

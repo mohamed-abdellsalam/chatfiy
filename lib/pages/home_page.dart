@@ -69,7 +69,9 @@ class _HomePageState extends State<HomePage> {
     }
 
     return UserTile(
-      text: userData["email"],
+      text: userData["name"] ??
+          userData[
+              "email"], // Display name if available, otherwise fallback to email
       onTap: () {
         Navigator.push(
           context,

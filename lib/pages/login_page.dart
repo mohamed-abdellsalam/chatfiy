@@ -16,6 +16,13 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   // Email validation
   bool _isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -48,12 +55,17 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       _showErrorDialog(e.toString());
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        // Check if the widget is still in the tree before calling setState
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   // Show error dialog
   void _showErrorDialog(String message) {
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

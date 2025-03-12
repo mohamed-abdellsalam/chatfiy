@@ -12,6 +12,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -23,6 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -34,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Show error message
   void _showErrorDialog(String message) {
-    if (!mounted) return; // Ensure widget is still in the tree
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -57,7 +59,8 @@ class _RegisterPageState extends State<RegisterPage> {
     // Input validation
     if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
+        _confirmPasswordController.text.isEmpty ||
+        _nameController.text.isEmpty) {
       _showErrorDialog("Please fill in all fields.");
       return;
     }
@@ -83,6 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
       await auth.signUpWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text.trim(),
+        _nameController.text.trim(), // Pass the name
       );
     } catch (e) {
       _showErrorDialog(e.toString());
@@ -100,70 +104,78 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_add,
-                size: 60,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 50),
-              Text(
-                "Let's create an account for you",
-                style: TextStyle(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.person_add,
+                  size: 60,
                   color: Theme.of(context).colorScheme.primary,
-                  fontSize: 16,
                 ),
-              ),
-              const SizedBox(height: 25),
-              MyTextField(
-                hintText: 'Email',
-                obscureText: false,
-                controller: _emailController,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                hintText: 'Password',
-                obscureText: true,
-                controller: _passwordController,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                hintText: 'Confirm Password',
-                obscureText: true,
-                controller: _confirmPasswordController,
-              ),
-              const SizedBox(height: 25),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : MyButton(
-                      text: 'Register',
-                      onTap: register,
-                    ),
-              const SizedBox(height: 25),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Already have an account? ',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                const SizedBox(height: 50),
+                Text(
+                  "Let's create an account for you",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 16,
                   ),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: Text(
-                      'Login now',
+                ),
+                const SizedBox(height: 25),
+                MyTextField(
+                  hintText: 'Email',
+                  obscureText: false,
+                  controller: _emailController,
+                ),
+                const SizedBox(height: 10),
+                MyTextField(
+                  hintText: 'Your name',
+                  obscureText: false,
+                  controller: _nameController,
+                ),
+                const SizedBox(height: 10),
+                MyTextField(
+                  hintText: 'Password',
+                  obscureText: true,
+                  controller: _passwordController,
+                ),
+                const SizedBox(height: 10),
+                MyTextField(
+                  hintText: 'Confirm Password',
+                  obscureText: true,
+                  controller: _confirmPasswordController,
+                ),
+                const SizedBox(height: 25),
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : MyButton(
+                        text: 'Register',
+                        onTap: register,
+                      ),
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Already have an account? ',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Text(
+                        'Login now',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
