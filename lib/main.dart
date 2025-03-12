@@ -1,5 +1,5 @@
 import 'package:chatify/firebase_options.dart';
-import 'package:chatify/services/auth/auth_gate.dart';
+import 'package:chatify/pages/splash_page.dart';
 import 'package:chatify/themes/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class Chatify extends StatelessWidget {
     return SafeArea(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const AuthGate(),
+        home: const SplashView(),
         theme: Provider.of<ThemeProvider>(context).themeData,
       ),
     );
