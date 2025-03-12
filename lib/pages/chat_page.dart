@@ -2,6 +2,7 @@ import 'package:chatify/components/chat_buble.dart';
 import 'package:chatify/components/my_text_field.dart';
 import 'package:chatify/services/auth/auth_service.dart';
 import 'package:chatify/services/chat/chat_services.dart';
+import 'package:chatify/utils/app_styls.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -114,19 +115,22 @@ class _ChatPageState extends State<ChatPage> {
         title: isLoading
             ? const CircularProgressIndicator()
             : Text(
-                receiverName != null
-                    ? '$receiverName (${widget.receiverEmail})'
-                    : widget.receiverEmail,
-                style: const TextStyle(fontWeight: FontWeight.w500),
+                receiverName ?? 'Unknown',
+                style: AppStyles.styleSemiBold18(context),
               ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _buildMessageList(),
-          ),
-          _buildUserInput(),
-        ],
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: _buildMessageList(),
+            ),
+            _buildUserInput(),
+          ],
+        ),
       ),
     );
   }
@@ -137,13 +141,17 @@ class _ChatPageState extends State<ChatPage> {
       stream: _chatServices.getMessages(widget.receiverID, senderID),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text('Error loading messages'));
+          return Center(
+              child: Text('Error loading messages',
+                  style: AppStyles.styleRegular14(context)));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No messages yet'));
+          return Center(
+              child: Text('No messages yet',
+                  style: AppStyles.styleRegular14(context)));
         }
         return ListView(
           controller: _scrollController,

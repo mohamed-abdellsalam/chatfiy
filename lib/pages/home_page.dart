@@ -3,6 +3,7 @@ import 'package:chatify/components/user_tile.dart';
 import 'package:chatify/pages/chat_page.dart';
 import 'package:chatify/services/auth/auth_service.dart';
 import 'package:chatify/services/chat/chat_services.dart';
+import 'package:chatify/utils/app_styls.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,7 +28,10 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.grey,
         elevation: 0,
-        title: const Text('Home'),
+        title: Text(
+          'Home',
+          style: AppStyles.styleSemiBold20(context),
+        ),
       ),
       drawer: const MyDrawer(),
       body: _buildUserList(),
@@ -39,7 +43,12 @@ class _HomePageState extends State<HomePage> {
       stream: _chatServices.getUsersStream(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Center(child: Text('Error loading users'));
+          return Center(
+            child: Text(
+              'Error loading users',
+              style: AppStyles.styleRegular16(context),
+            ),
+          );
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -47,7 +56,12 @@ class _HomePageState extends State<HomePage> {
         if (!snapshot.hasData ||
             snapshot.data == null ||
             snapshot.data!.isEmpty) {
-          return const Center(child: Text('No users available'));
+          return Center(
+            child: Text(
+              'No users available',
+              style: AppStyles.styleRegular16(context),
+            ),
+          );
         }
 
         return ListView.builder(
@@ -69,9 +83,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     return UserTile(
-      text: userData["name"] ??
-          userData[
-              "email"], // Display name if available, otherwise fallback to email
+      text: userData["name"] ?? userData["email"],
+      textStyle: AppStyles.styleMedium16(context),
       onTap: () {
         Navigator.push(
           context,

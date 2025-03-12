@@ -1,6 +1,7 @@
 import 'package:chatify/components/my_button.dart';
 import 'package:chatify/components/my_text_field.dart';
 import 'package:chatify/services/auth/auth_service.dart';
+import 'package:chatify/utils/app_styls.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -56,7 +57,6 @@ class _LoginPageState extends State<LoginPage> {
       _showErrorDialog(e.toString());
     } finally {
       if (mounted) {
-        // Check if the widget is still in the tree before calling setState
         setState(() => _isLoading = false);
       }
     }
@@ -99,10 +99,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 50),
               Text(
                 "Welcome back! We've missed you 👋",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 16,
-                ),
+                style: AppStyles.styleMedium16(context),
               ),
               const SizedBox(height: 25),
               MyTextField(
@@ -129,18 +126,13 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Text(
                     'Not a member? ',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: AppStyles.styleRegular14(context),
                   ),
                   GestureDetector(
                     onTap: widget.onTap,
                     child: Text(
                       'Register now',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      style: AppStyles.styleSemiBold16(context),
                     ),
                   ),
                 ],

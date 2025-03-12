@@ -1,6 +1,7 @@
 import 'package:chatify/components/my_button.dart';
 import 'package:chatify/components/my_text_field.dart';
 import 'package:chatify/services/auth/auth_service.dart';
+import 'package:chatify/utils/app_styls.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -40,12 +41,21 @@ class _RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Registration Failed"),
-        content: Text(message),
+        title: Text(
+          "Registration Failed",
+          style: AppStyles.styleSemiBold16(context),
+        ),
+        content: Text(
+          message,
+          style: AppStyles.styleRegular14(context),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
+            child: Text(
+              "OK",
+              style: AppStyles.styleMedium16(context),
+            ),
           ),
         ],
       ),
@@ -116,10 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 50),
                 Text(
                   "Let's create an account for you",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 16,
-                  ),
+                  style: AppStyles.styleMedium20(context),
                 ),
                 const SizedBox(height: 25),
                 MyTextField(
@@ -158,18 +165,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     Text(
                       'Already have an account? ',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      style: AppStyles.styleRegular16(context),
                     ),
                     GestureDetector(
                       onTap: widget.onTap,
                       child: Text(
                         'Login now',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        style: AppStyles.styleBold16(context),
                       ),
                     ),
                   ],
